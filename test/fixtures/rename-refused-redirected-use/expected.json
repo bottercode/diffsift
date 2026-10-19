@@ -1,0 +1,32 @@
+{
+  "summary": {
+    "realLines": 3,
+    "byCategory": {
+      "format": 0,
+      "comment": 0,
+      "rename": 0,
+      "move": 0,
+      "real": 6
+    }
+  },
+  "renames": [],
+  "moves": [],
+  "realChanges": [
+    "area.ts:new:2-4"
+  ],
+  "formatFiles": [],
+  "lines": [
+    {
+      "file": "area.ts",
+      "lines": [
+        "old:2 real",
+        "old:3 real",
+        "old:4 real",
+        "new:2 real",
+        "new:3 real",
+        "new:4 real"
+      ]
+    }
+  ],
+  "diagnostics": []
+}

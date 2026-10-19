@@ -1,0 +1,30 @@
+{
+  "summary": {
+    "realLines": 2,
+    "byCategory": {
+      "format": 0,
+      "comment": 0,
+      "rename": 0,
+      "move": 0,
+      "real": 4
+    }
+  },
+  "renames": [],
+  "moves": [],
+  "realChanges": [
+    "order.ts:new:1-2"
+  ],
+  "formatFiles": [],
+  "lines": [
+    {
+      "file": "order.ts",
+      "lines": [
+        "old:1 real",
+        "old:2 real",
+        "new:1 real",
+        "new:2 real"
+      ]
+    }
+  ],
+  "diagnostics": []
+}
