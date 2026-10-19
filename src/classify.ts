@@ -167,8 +167,6 @@ export function classifyGaps(
 
   recordExplained(oldSide, oldStream, ledgers.old, explainedOld);
   recordExplained(newSide, newStream, ledgers.new, explainedNew);
-  recordDropped(oldSide, oldStream, ledgers.old);
-  recordDropped(newSide, newStream, ledgers.new);
 }
 
 /**
@@ -323,14 +321,6 @@ function literalKind(token: Token): FormatRule | null {
 function tokenLines(side: SideInput, token: Token): number[] {
   const [first, last] = lineSpan(side.lines, token.start, token.end);
   return range(first, last + 1);
-}
-
-/** Note the formatting rule of each dropped punctuation token on its line. */
-function recordDropped(side: SideInput, stream: TokenStream, ledger: LineLedger) {
-  for (const dropped of stream.dropped) {
-    const [first, last] = lineSpan(side.lines, dropped.start, dropped.end);
-    for (let line = first; line <= last; line++) ledger.at(line).kinds.add(dropped.rule);
-  }
 }
 
 export interface Gap {

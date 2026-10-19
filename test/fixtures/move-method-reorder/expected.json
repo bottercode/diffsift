@@ -1,0 +1,41 @@
+{
+  "summary": {
+    "realLines": 0,
+    "byCategory": {
+      "format": 3,
+      "comment": 0,
+      "rename": 0,
+      "move": 5,
+      "real": 0
+    }
+  },
+  "renames": [],
+  "moves": [
+    {
+      "symbol": "Store.load",
+      "from": "a.ts",
+      "to": "a.ts",
+      "changedInside": false
+    }
+  ],
+  "realChanges": [],
+  "formatFiles": [
+    "a.ts [whitespace]"
+  ],
+  "lines": [
+    {
+      "file": "a.ts",
+      "lines": [
+        "old:2 move",
+        "old:3 move",
+        "old:4 move",
+        "old:5 format",
+        "new:4 format",
+        "new:5 format",
+        "new:6 move",
+        "new:7 move"
+      ]
+    }
+  ],
+  "diagnostics": []
+}

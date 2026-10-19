@@ -1,0 +1,30 @@
+{
+  "summary": {
+    "realLines": 1,
+    "byCategory": {
+      "format": 1,
+      "comment": 0,
+      "rename": 0,
+      "move": 0,
+      "real": 1
+    }
+  },
+  "renames": [],
+  "moves": [],
+  "realChanges": [
+    "a.ts:old:1"
+  ],
+  "formatFiles": [
+    "a.ts [semicolons, trailing-commas]"
+  ],
+  "lines": [
+    {
+      "file": "a.ts",
+      "lines": [
+        "old:1 real",
+        "new:1 format"
+      ]
+    }
+  ],
+  "diagnostics": []
+}

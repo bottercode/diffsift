@@ -1,0 +1,52 @@
+{
+  "summary": {
+    "realLines": 0,
+    "byCategory": {
+      "format": 1,
+      "comment": 0,
+      "rename": 0,
+      "move": 8,
+      "real": 0
+    }
+  },
+  "renames": [],
+  "moves": [
+    {
+      "symbol": "slug",
+      "from": "utils.ts",
+      "to": "strings.ts",
+      "changedInside": false
+    }
+  ],
+  "realChanges": [],
+  "formatFiles": [
+    "utils.ts [whitespace]"
+  ],
+  "lines": [
+    {
+      "file": "page.ts",
+      "lines": [
+        "old:1 move",
+        "new:1 move"
+      ]
+    },
+    {
+      "file": "strings.ts",
+      "lines": [
+        "new:1 move",
+        "new:2 move",
+        "new:3 move"
+      ]
+    },
+    {
+      "file": "utils.ts",
+      "lines": [
+        "old:4 format",
+        "old:5 move",
+        "old:6 move",
+        "old:7 move"
+      ]
+    }
+  ],
+  "diagnostics": []
+}

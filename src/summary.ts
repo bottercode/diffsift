@@ -11,7 +11,7 @@
 import type { FileLedgers, LineVerdict, SideInput } from "./classify";
 import type { Decl } from "./declarations";
 import type { Grammar } from "./languages";
-import { splitLines } from "./lines";
+import { lineAt, splitLines } from "./lines";
 import type { MoveRecord, MoveResult } from "./match";
 import type { ParsedFile } from "./parser";
 import type { HunkRange } from "./patch";
@@ -320,17 +320,47 @@ function collectFormatFiles(files: AnalyzedFile[], verdicts: Map<AnalyzedFile, {
     const format = all.filter((verdict) => verdict.category === "format");
     if (format.length === 0) continue;
 
-    // A format line with no recorded rule changed only whitespace: indentation, wrapping, or a
-    // blank line. An old line without a rule may just be the side that lacked the semicolon, so
-    // old lines count as whitespace evidence only when they are blank.
+    // Literal rewrites (quotes, numbers, key quotes, JSX text) are recorded per line. Dropped
+    // punctuation counts only when the changed lines of the two sides differ in how much of it
+    // they have, so unchanged semicolons on a reformatted line are not reported as a change.
     const kinds = new Set<string>();
     const oldLines = splitLines(file.old.text);
+    const newLines = splitLines(file.new.text);
+    const droppedCounts = (side: "old" | "new") => {
+      const counts = new Map<string, number>();
+      const sideInput = side === "old" ? file.old : file.new;
+      const changed = side === "old" ? fileVerdicts.old : fileVerdicts.new;
+      for (const dropped of sideInput.stream!.dropped) {
+        const line = lineAt(sideInput.lines, dropped.start);
+        if (changed.get(line)?.category === "format") counts.set(dropped.rule, (counts.get(dropped.rule) ?? 0) + 1);
+      }
+      return counts;
+    };
+    const oldDropped = droppedCounts("old");
+    const newDropped = droppedCounts("new");
+    for (const rule of new Set([...oldDropped.keys(), ...newDropped.keys()])) {
+      if ((oldDropped.get(rule) ?? 0) !== (newDropped.get(rule) ?? 0)) kinds.add(rule);
+    }
+
     for (const [side, sideVerdicts] of [["old", fileVerdicts.old], ["new", fileVerdicts.new]] as const) {
       for (const [line, verdict] of sideVerdicts) {
         if (verdict.category !== "format") continue;
         const ruled = [...(verdict.kinds ?? [])].filter((kind) => kind !== "whitespace");
         ruled.forEach((kind) => kinds.add(kind));
-        if (ruled.length === 0 && (side === "new" || (oldLines[line - 1] ?? "").trim() === "")) kinds.add("whitespace");
+        const text = side === "old" ? oldLines[line - 1] : newLines[line - 1];
+        if ((text ?? "").endsWith("\r") !== ((side === "old" ? newLines : oldLines)[line - 1] ?? "").endsWith("\r")) kinds.add("line-endings");
+      }
+    }
+
+    // Lines that differ only in whitespace: present when some format line is explained by
+    // nothing above (indentation, wrapping, blank lines).
+    const explained = kinds.size > 0;
+    for (const [side, sideVerdicts] of [["old", fileVerdicts.old], ["new", fileVerdicts.new]] as const) {
+      for (const [line, verdict] of sideVerdicts) {
+        if (verdict.category !== "format") continue;
+        const text = (side === "old" ? oldLines : newLines)[line - 1] ?? "";
+        const ruled = [...(verdict.kinds ?? [])].filter((kind) => kind !== "whitespace");
+        if (ruled.length === 0 && (text.trim() === "" || !explained)) kinds.add("whitespace");
       }
     }
     result.push({

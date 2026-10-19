@@ -1,0 +1,40 @@
+{
+  "summary": {
+    "realLines": 0,
+    "byCategory": {
+      "format": 0,
+      "comment": 0,
+      "rename": 4,
+      "move": 0,
+      "real": 0
+    }
+  },
+  "renames": [
+    {
+      "from": "getUser",
+      "to": "fetchUser",
+      "count": 2,
+      "exported": true
+    }
+  ],
+  "moves": [],
+  "realChanges": [],
+  "formatFiles": [],
+  "lines": [
+    {
+      "file": "lib.ts",
+      "lines": [
+        "old:1 rename",
+        "new:1 rename"
+      ]
+    },
+    {
+      "file": "use.ts",
+      "lines": [
+        "old:1 rename",
+        "new:1 rename"
+      ]
+    }
+  ],
+  "diagnostics": []
+}

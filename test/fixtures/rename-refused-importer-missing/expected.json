@@ -1,0 +1,44 @@
+{
+  "summary": {
+    "realLines": 3,
+    "byCategory": {
+      "format": 0,
+      "comment": 1,
+      "rename": 0,
+      "move": 0,
+      "real": 6
+    }
+  },
+  "renames": [],
+  "moves": [],
+  "realChanges": [
+    "lib.ts:new:1",
+    "use.ts:new:1-2"
+  ],
+  "formatFiles": [],
+  "lines": [
+    {
+      "file": "lib.ts",
+      "lines": [
+        "old:1 real",
+        "new:1 real"
+      ]
+    },
+    {
+      "file": "other.ts",
+      "lines": [
+        "new:3 comment"
+      ]
+    },
+    {
+      "file": "use.ts",
+      "lines": [
+        "old:1 real",
+        "old:2 real",
+        "new:1 real",
+        "new:2 real"
+      ]
+    }
+  ],
+  "diagnostics": []
+}

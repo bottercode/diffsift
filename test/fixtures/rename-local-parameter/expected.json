@@ -1,0 +1,35 @@
+{
+  "summary": {
+    "realLines": 0,
+    "byCategory": {
+      "format": 0,
+      "comment": 0,
+      "rename": 4,
+      "move": 0,
+      "real": 0
+    }
+  },
+  "renames": [
+    {
+      "from": "items",
+      "to": "values",
+      "count": 2,
+      "exported": false
+    }
+  ],
+  "moves": [],
+  "realChanges": [],
+  "formatFiles": [],
+  "lines": [
+    {
+      "file": "a.ts",
+      "lines": [
+        "old:1 rename",
+        "old:3 rename",
+        "new:1 rename",
+        "new:3 rename"
+      ]
+    }
+  ],
+  "diagnostics": []
+}

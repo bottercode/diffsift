@@ -1,0 +1,35 @@
+{
+  "summary": {
+    "realLines": 3,
+    "byCategory": {
+      "format": 3,
+      "comment": 0,
+      "rename": 0,
+      "move": 0,
+      "real": 4
+    }
+  },
+  "renames": [],
+  "moves": [],
+  "realChanges": [
+    "c.tsx:new:2-4"
+  ],
+  "formatFiles": [
+    "c.tsx [parens, semicolons]"
+  ],
+  "lines": [
+    {
+      "file": "c.tsx",
+      "lines": [
+        "old:1 real",
+        "new:1 format",
+        "new:2 real",
+        "new:3 real",
+        "new:4 real",
+        "new:5 format",
+        "new:6 format"
+      ]
+    }
+  ],
+  "diagnostics": []
+}

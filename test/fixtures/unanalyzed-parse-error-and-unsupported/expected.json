@@ -1,0 +1,39 @@
+{
+  "summary": {
+    "realLines": 2,
+    "byCategory": {
+      "format": 0,
+      "comment": 0,
+      "rename": 0,
+      "move": 0,
+      "real": 4
+    }
+  },
+  "renames": [],
+  "moves": [],
+  "realChanges": [
+    "a.ts:new:1",
+    "notes.py:new:1"
+  ],
+  "formatFiles": [],
+  "lines": [
+    {
+      "file": "a.ts",
+      "lines": [
+        "old:1 real (parse-error)",
+        "new:1 real (parse-error)"
+      ]
+    },
+    {
+      "file": "notes.py",
+      "lines": [
+        "old:1 real (unsupported-language)",
+        "new:1 real (unsupported-language)"
+      ]
+    }
+  ],
+  "diagnostics": [
+    "a.ts: parse-error",
+    "notes.py: unsupported-language"
+  ]
+}
