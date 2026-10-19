@@ -1,0 +1,73 @@
+{
+  "summary": {
+    "realLines": 1,
+    "byCategory": {
+      "format": 8,
+      "comment": 0,
+      "rename": 6,
+      "move": 4,
+      "real": 2
+    }
+  },
+  "renames": [
+    {
+      "from": "getUser",
+      "to": "fetchUser",
+      "count": 3,
+      "exported": true
+    }
+  ],
+  "moves": [
+    {
+      "symbol": "isExpired",
+      "from": "src/utils.ts",
+      "to": "src/auth/session.ts",
+      "changedInside": true
+    }
+  ],
+  "realChanges": [
+    "src/auth/session.ts:new:2"
+  ],
+  "formatFiles": [
+    "src/api.ts [quotes, semicolons]",
+    "src/utils.ts [quotes, semicolons, whitespace]"
+  ],
+  "lines": [
+    {
+      "file": "src/api.ts",
+      "lines": [
+        "old:1 rename",
+        "old:4 rename",
+        "old:5 format",
+        "old:6 format",
+        "new:1 rename",
+        "new:2 move",
+        "new:5 rename",
+        "new:6 format",
+        "new:7 format"
+      ]
+    },
+    {
+      "file": "src/auth/session.ts",
+      "lines": [
+        "new:1 move",
+        "new:2 real",
+        "new:3 move"
+      ]
+    },
+    {
+      "file": "src/utils.ts",
+      "lines": [
+        "old:1 rename",
+        "old:2 format",
+        "old:3 format",
+        "old:4 format",
+        "old:5 move",
+        "old:6 real",
+        "new:1 rename",
+        "new:2 format"
+      ]
+    }
+  ],
+  "diagnostics": []
+}

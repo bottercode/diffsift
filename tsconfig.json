@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "Preserve",
+    "moduleResolution": "bundler",
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "skipLibCheck": true,
+    "noEmit": true,
+    "types": [
+      "bun"
+    ]
+  },
+  "include": [
+    "src",
+    "scripts",
+    "test"
+  ],
+  "exclude": [
+    "test/fixtures"
+  ]
+}
