@@ -65,7 +65,16 @@ export function buildResult(files: AnalyzedFile[], renames: RenameResult, moves:
     }
   }
 
-  const realLines = realChanges.reduce((total, change) => total + change.endLine - change.line + 1, 0);
+  // Count real lines, not spans: blank lines bridged inside a change are not real.
+  const realLines = realChanges.reduce((total, change) => {
+    const file = files.find((candidate) => (change.side === "old" ? candidate.oldPath : candidate.newPath) === change.file);
+    const sideVerdicts = file ? verdicts.get(file)![change.side] : undefined;
+    let count = 0;
+    for (let line = change.line; line <= change.endLine; line++) {
+      if (!sideVerdicts || sideVerdicts.get(line)?.category === "real") count += 1;
+    }
+    return total + count;
+  }, 0);
   const changedLines = fileResults.reduce((total, file) => total + file.lines.length, 0);
 
   return {
@@ -226,6 +235,7 @@ function collectRealChanges(
           line,
           endLine,
           ...(oldReal.length > 0 ? { oldLine: oldReal[0]!, oldEndLine: oldReal.at(-1)! } : {}),
+          ...(oldReal.length > 0 && record.oldFile !== record.newFile ? { oldFile: record.oldFile.oldPath ?? "" } : {}),
           reason: "changed",
           symbol,
         });
@@ -248,7 +258,7 @@ function collectRealChanges(
       const newReal = linesIn(fileVerdicts.new, hunk.newStart, hunk.newStart + hunk.newCount - 1, "real").filter((line) => !taken?.new.has(line));
 
       if (newReal.length > 0) {
-        for (const [line, endLine] of runs(newReal)) {
+        for (const [line, endLine] of runs(newReal, isBlank(file.new.text))) {
           changes.push({
             file: file.newPath ?? file.oldPath ?? "",
             side: "new",
@@ -260,7 +270,7 @@ function collectRealChanges(
           });
         }
       } else {
-        for (const [line, endLine] of runs(oldReal)) {
+        for (const [line, endLine] of runs(oldReal, isBlank(file.old.text))) {
           changes.push({
             file: file.oldPath ?? file.newPath ?? "",
             side: "old",
@@ -295,12 +305,20 @@ function linesIn(verdicts: Map<number, LineVerdict>, from: number, to: number, c
   return lines;
 }
 
-/** Collapse sorted line numbers into inclusive runs. */
-function runs(lines: number[]): Array<[number, number]> {
+/**
+ * Collapse sorted line numbers into inclusive runs. With `bridge`, runs separated only by lines
+ * it accepts (blank lines) are joined, so one added block reads as one change.
+ */
+function runs(lines: number[], bridge: (line: number) => boolean = () => false): Array<[number, number]> {
   const result: Array<[number, number]> = [];
   for (const line of lines) {
     const last = result.at(-1);
-    if (last && last[1] === line - 1) {
+    let joinable = last !== undefined;
+    for (let between = (last?.[1] ?? 0) + 1; joinable && between < line; between++) {
+      joinable = bridge(between);
+    }
+
+    if (last && joinable) {
       last[1] = line;
     } else {
       result.push([line, line]);
@@ -308,6 +326,12 @@ function runs(lines: number[]): Array<[number, number]> {
   }
 
   return result;
+}
+
+/** Predicate for blank lines of a text (one-based). */
+function isBlank(text: string): (line: number) => boolean {
+  const lines = splitLines(text);
+  return (line) => (lines[line - 1] ?? "").trim() === "";
 }
 
 /** Files with formatting lines, with the kinds of formatting seen. */

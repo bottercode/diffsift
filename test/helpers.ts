@@ -2,8 +2,9 @@
  * Shared test helpers: one parser host per test process, and shortcuts for tokenizing source.
  */
 
-import { existsSync, readdirSync, readFileSync } from "node:fs";
-import { join, relative, sep } from "node:path";
+import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, realpathSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { dirname, join, relative, sep } from "node:path";
 import { readGrammarSources } from "../src/node/wasm";
 import type { Grammar } from "../src/languages";
 import { createParserHost, type ParserHost } from "../src/parser";
@@ -94,4 +95,54 @@ export function projectTestResult(result: SiftResult) {
     })),
     diagnostics: result.diagnostics.map((diagnostic) => `${diagnostic.file}: ${diagnostic.code}`),
   };
+}
+
+/** Run git in a test repository and fail loudly on errors. */
+export function testGit(cwd: string, ...args: string[]): string {
+  const result = Bun.spawnSync(["git", "-c", "user.name=test", "-c", "user.email=test@example.com", "-c", "commit.gpgsign=false", ...args], { cwd });
+  if (result.exitCode !== 0) throw new Error(`git ${args.join(" ")}: ${result.stderr.toString()}`);
+  return result.stdout.toString();
+}
+
+/** Write a map of relative paths to contents under a directory. */
+export function writeTestTree(root: string, files: Record<string, string | Uint8Array>) {
+  for (const [path, content] of Object.entries(files)) {
+    const full = join(root, path);
+    mkdirSync(dirname(full), { recursive: true });
+    writeFileSync(full, content);
+  }
+}
+
+/**
+ * Build a temporary repository with a fixture's `old/` tree committed as `base` and its `new/`
+ * tree committed on top as `head`. Returns the repo root and a cleanup function.
+ */
+export function createTestRepo(fixtureDirectory: string, extra: Record<string, string> = {}) {
+  const root = realpathSync(mkdtempSync(join(tmpdir(), "diffsift-repo-")));
+  testGit(root, "init", "-q", "-b", "main");
+  const copyTree = (from: string) => {
+    if (!existsSync(from)) return;
+    for (const entry of readdirSync(from, { recursive: true, withFileTypes: true })) {
+      if (!entry.isFile()) continue;
+      const full = join(entry.parentPath, entry.name);
+      writeTestTree(root, { [relative(from, full).split(sep).join("/")]: readFileSync(full) });
+    }
+  };
+
+  copyTree(join(fixtureDirectory, "old"));
+  writeTestTree(root, extra);
+  testGit(root, "add", "-A");
+  testGit(root, "commit", "-q", "-m", "base");
+  testGit(root, "tag", "base");
+
+  for (const entry of readdirSync(root)) {
+    if (entry !== ".git") rmSync(join(root, entry), { recursive: true, force: true });
+  }
+  copyTree(join(fixtureDirectory, "new"));
+  // Extra files stay byte-identical, so they are unchanged files outside the change set.
+  writeTestTree(root, extra);
+  testGit(root, "add", "-A");
+  testGit(root, "commit", "-q", "-m", "head");
+
+  return { root, cleanup: () => rmSync(root, { recursive: true, force: true }) };
 }

@@ -101,6 +101,8 @@ export interface RealChange {
   endLine: number;
   oldLine?: number;
   oldEndLine?: number;
+  /** Old-side file of `oldLine` when it differs from `file` (a declaration edited while moving files). */
+  oldFile?: string;
   reason: RealReason;
   /** Enclosing declaration, when known. */
   symbol?: string;
