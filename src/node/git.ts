@@ -44,6 +44,10 @@ export function runGit(cwd: string, args: string[], input?: string): Promise<Buf
       if (code === 0) resolve(Buffer.concat(out));
       else reject(new Error(`git ${args.join(" ")} failed: ${Buffer.concat(err).toString().trim()}`));
     });
+
+    // git can exit before reading its stdin (EPIPE, e.g. `git grep` with no match); the exit code
+    // already reports any failure, so a write error must not crash the process.
+    child.stdin.on("error", () => {});
     child.stdin.end(input ?? "");
   });
 }
