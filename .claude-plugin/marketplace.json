@@ -1,0 +1,19 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "diffsift",
+  "description": "diffsift: review the real changes in TypeScript/JavaScript diffs",
+  "owner": {
+    "name": "bottercode"
+  },
+  "plugins": [
+    {
+      "name": "diffsift",
+      "description": "Separate the real changes in a TypeScript/JavaScript diff from formatting, renames, and moved code",
+      "author": {
+        "name": "bottercode"
+      },
+      "source": "./",
+      "category": "development"
+    }
+  ]
+}

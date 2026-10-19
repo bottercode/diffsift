@@ -1,0 +1,19 @@
+{
+  "name": "diffsift",
+  "version": "0.1.0",
+  "description": "Separate the real changes in a TypeScript/JavaScript diff from formatting, renames, and moved code. Adds the diffsift skill and an MCP server with sift_changes and real_changes.",
+  "author": {
+    "name": "bottercode"
+  },
+  "homepage": "https://github.com/bottercode/diffsift",
+  "repository": "https://github.com/bottercode/diffsift",
+  "license": "MIT",
+  "keywords": ["diff", "code-review", "refactoring", "typescript", "mcp"],
+  "skills": "./skills",
+  "mcpServers": {
+    "diffsift": {
+      "command": "npx",
+      "args": ["-y", "diffsift@0.1.0", "mcp"]
+    }
+  }
+}
