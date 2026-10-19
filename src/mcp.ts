@@ -16,8 +16,7 @@ import { defaultParserHost } from "./index";
 import { parseRevisionArgument, readGitPairs, runGit } from "./node/git";
 import { sift } from "./sift";
 import type { FilePair, SiftResult } from "./types";
-
-const VERSION = "0.1.0";
+import { VERSION } from "./version";
 
 const scopeShape = {
   repo: z.string().optional().describe("Repository directory; defaults to the server's working directory."),

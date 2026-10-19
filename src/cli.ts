@@ -12,8 +12,7 @@ import { renderText, shouldColor } from "./render";
 import { sift } from "./sift";
 import type { Category, FilePair, SiftResult } from "./types";
 import { readFile } from "node:fs/promises";
-
-const VERSION = "0.1.0";
+import { VERSION } from "./version";
 
 const HELP = `diffsift ${VERSION}: separate the real changes in a TypeScript/JavaScript diff from formatting, renames, and moved code
 
@@ -36,7 +35,7 @@ Options:
 `;
 
 /** Parse arguments and run; returns the process exit code. */
-export async function main(argv: string[]): Promise<number> {
+async function main(argv: string[]): Promise<number> {
   if (argv[0] === "mcp") {
     const { startMcpServer } = await import("./mcp");
     await startMcpServer();
@@ -124,22 +123,14 @@ function filterOnly(result: SiftResult, only: Category | undefined): SiftResult 
   };
 }
 
-const isEntry = (() => {
-  try {
-    return import.meta.main ?? process.argv[1] === new URL(import.meta.url).pathname;
-  } catch {
-    return false;
-  }
-})();
-
-if (isEntry) {
-  main(process.argv.slice(2)).then(
-    (code) => {
-      if (code >= 0) process.exitCode = code;
-    },
-    (error: unknown) => {
-      process.stderr.write(`diffsift: ${error instanceof Error ? error.message : String(error)}\n`);
-      process.exitCode = 2;
-    },
-  );
-}
+// This module is only ever run as the `diffsift` bin (npm runs it through a symlink, so an
+// "am I the entry point" check against argv would fail); importing it starts the CLI.
+main(process.argv.slice(2)).then(
+  (code) => {
+    if (code >= 0) process.exitCode = code;
+  },
+  (error: unknown) => {
+    process.stderr.write(`diffsift: ${error instanceof Error ? error.message : String(error)}\n`);
+    process.exitCode = 2;
+  },
+);

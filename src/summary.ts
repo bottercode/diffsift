@@ -17,7 +17,8 @@ import type { ParsedFile } from "./parser";
 import type { HunkRange } from "./patch";
 import type { RenameResult } from "./renames";
 import type { SiftOptions } from "./sift";
-import type { Category, Diagnostic, FileResult, FileStatus, FormatFile, LineEntry, Move, RealChange, RealReason, Rename, Side, SiftResult } from "./types";
+import type { Category, Diagnostic, FileResult, FileStatus, FormatFile, FormatKind, LineEntry, Move, RealChange, RealReason, Rename, Side, SiftResult } from "./types";
+import { VERSION } from "./version";
 
 export interface AnalyzedFile {
   oldPath: string | null;
@@ -36,8 +37,6 @@ export interface AnalyzedFile {
   oldDeclarations?: Decl[];
   newDeclarations?: Decl[];
 }
-
-const VERSION = "0.1.0";
 
 /** Assemble the final result. */
 export function buildResult(files: AnalyzedFile[], renames: RenameResult, moves: MoveResult, options: SiftOptions): SiftResult {
@@ -347,11 +346,11 @@ function collectFormatFiles(files: AnalyzedFile[], verdicts: Map<AnalyzedFile, {
     // Literal rewrites (quotes, numbers, key quotes, JSX text) are recorded per line. Dropped
     // punctuation counts only when the changed lines of the two sides differ in how much of it
     // they have, so unchanged semicolons on a reformatted line are not reported as a change.
-    const kinds = new Set<string>();
+    const kinds = new Set<FormatKind>();
     const oldLines = splitLines(file.old.text);
     const newLines = splitLines(file.new.text);
     const droppedCounts = (side: "old" | "new") => {
-      const counts = new Map<string, number>();
+      const counts = new Map<FormatKind, number>();
       const sideInput = side === "old" ? file.old : file.new;
       const changed = side === "old" ? fileVerdicts.old : fileVerdicts.new;
       for (const dropped of sideInput.stream!.dropped) {
@@ -390,7 +389,7 @@ function collectFormatFiles(files: AnalyzedFile[], verdicts: Map<AnalyzedFile, {
     result.push({
       file: file.newPath ?? file.oldPath ?? "",
       lines: format.length,
-      kinds: [...kinds].sort() as FormatFile["kinds"],
+      kinds: [...kinds].sort(),
       formatOnly: format.length === all.length,
     });
   }

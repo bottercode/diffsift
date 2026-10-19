@@ -108,10 +108,13 @@ export interface RealChange {
   symbol?: string;
 }
 
+/** What a formatting line changed: a token rule, line endings, or only whitespace. */
+export type FormatKind = FormatRule | "line-endings" | "whitespace";
+
 export interface FormatFile {
   file: string;
   lines: number;
-  kinds: Array<FormatRule | "whitespace">;
+  kinds: FormatKind[];
   formatOnly: boolean;
 }
 

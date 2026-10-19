@@ -1,0 +1,217 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/bottercode/diffsift/schema/diffsift.schema.v1.json",
+  "title": "diffsift result, schema v1",
+  "description": "Every line git reports as changed appears in files[].lines with exactly one category. Mechanical categories (format, rename, move) are proven; anything unproven is real.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "tool", "source", "summary", "renames", "moves", "fileMoves", "formatFiles", "realChanges", "files", "diagnostics"],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "tool": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "version"],
+      "properties": {
+        "name": { "const": "diffsift" },
+        "version": { "type": "string" }
+      }
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "diffAlgorithm"],
+      "properties": {
+        "kind": { "enum": ["range", "staged", "worktree", "files"] },
+        "base": { "type": "string" },
+        "head": { "type": "string" },
+        "diffAlgorithm": { "type": "string" }
+      }
+    },
+    "summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["files", "changedLines", "byCategory", "mechanicalRatio", "realLines"],
+      "properties": {
+        "files": { "$ref": "#/$defs/count" },
+        "changedLines": { "$ref": "#/$defs/count" },
+        "byCategory": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["format", "comment", "rename", "move", "real"],
+          "properties": {
+            "format": { "$ref": "#/$defs/count" },
+            "comment": { "$ref": "#/$defs/count" },
+            "rename": { "$ref": "#/$defs/count" },
+            "move": { "$ref": "#/$defs/count" },
+            "real": { "$ref": "#/$defs/count" }
+          }
+        },
+        "mechanicalRatio": { "type": "number", "minimum": 0, "maximum": 1 },
+        "realLines": { "$ref": "#/$defs/count" }
+      }
+    },
+    "renames": { "type": "array", "items": { "$ref": "#/$defs/rename" } },
+    "moves": { "type": "array", "items": { "$ref": "#/$defs/move" } },
+    "fileMoves": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["from", "to"],
+        "properties": {
+          "from": { "type": "string" },
+          "to": { "type": "string" }
+        }
+      }
+    },
+    "formatFiles": { "type": "array", "items": { "$ref": "#/$defs/formatFile" } },
+    "realChanges": { "type": "array", "items": { "$ref": "#/$defs/realChange" } },
+    "files": { "type": "array", "items": { "$ref": "#/$defs/file" } },
+    "diagnostics": { "type": "array", "items": { "$ref": "#/$defs/diagnostic" } }
+  },
+  "$defs": {
+    "count": { "type": "integer", "minimum": 0 },
+    "line": { "type": "integer", "minimum": 1 },
+    "side": { "enum": ["old", "new"] },
+    "category": { "enum": ["format", "comment", "rename", "move", "real"] },
+    "fileStatus": { "enum": ["modified", "added", "deleted", "renamed", "copied"] },
+    "realReason": {
+      "enum": ["changed", "unparsed", "parse-error", "unsupported-language", "binary", "too-large", "move-order-sensitive", "diff-too-large"]
+    },
+    "location": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["file", "line"],
+      "properties": {
+        "file": { "type": "string" },
+        "line": { "$ref": "#/$defs/line" }
+      }
+    },
+    "span": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["file", "startLine", "endLine"],
+      "properties": {
+        "file": { "type": "string" },
+        "startLine": { "$ref": "#/$defs/line" },
+        "endLine": { "$ref": "#/$defs/line" }
+      }
+    },
+    "rename": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "from", "to", "kind", "scope", "exported", "count", "declaredIn", "occurrences"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^r[0-9]+$" },
+        "from": { "type": "string" },
+        "to": { "type": "string" },
+        "kind": { "type": "string" },
+        "scope": { "enum": ["module", "local", "type"] },
+        "exported": { "type": "boolean" },
+        "count": { "$ref": "#/$defs/count" },
+        "declaredIn": { "$ref": "#/$defs/location" },
+        "occurrences": { "type": "array", "items": { "$ref": "#/$defs/location" } },
+        "crossFileUnverified": { "type": "boolean" }
+      }
+    },
+    "move": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "symbol", "kind", "from", "to", "changedInside", "changedLines"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^m[0-9]+$" },
+        "symbol": { "type": "string" },
+        "kind": { "type": "string" },
+        "from": { "$ref": "#/$defs/span" },
+        "to": { "$ref": "#/$defs/span" },
+        "renamedFrom": { "type": "string" },
+        "exportAdded": { "type": "boolean" },
+        "changedInside": { "type": "boolean" },
+        "changedLines": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["side", "file", "line"],
+            "properties": {
+              "side": { "$ref": "#/$defs/side" },
+              "file": { "type": "string" },
+              "line": { "$ref": "#/$defs/line" }
+            }
+          }
+        }
+      }
+    },
+    "formatFile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["file", "lines", "kinds", "formatOnly"],
+      "properties": {
+        "file": { "type": "string" },
+        "lines": { "$ref": "#/$defs/count" },
+        "kinds": {
+          "type": "array",
+          "items": { "enum": ["semicolons", "trailing-commas", "quotes", "parens", "numbers", "key-quotes", "separators", "jsx-whitespace", "line-endings", "whitespace"] }
+        },
+        "formatOnly": { "type": "boolean" }
+      }
+    },
+    "realChange": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["file", "side", "line", "endLine", "reason"],
+      "properties": {
+        "file": { "type": "string" },
+        "side": { "$ref": "#/$defs/side" },
+        "line": { "$ref": "#/$defs/line" },
+        "endLine": { "$ref": "#/$defs/line" },
+        "oldLine": { "$ref": "#/$defs/line" },
+        "oldEndLine": { "$ref": "#/$defs/line" },
+        "oldFile": { "type": "string" },
+        "reason": { "$ref": "#/$defs/realReason" },
+        "symbol": { "type": "string" }
+      }
+    },
+    "file": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["oldPath", "newPath", "status", "language", "analyzed", "formatOnly", "hunks", "lines"],
+      "properties": {
+        "oldPath": { "type": ["string", "null"] },
+        "newPath": { "type": ["string", "null"] },
+        "status": { "$ref": "#/$defs/fileStatus" },
+        "similarity": { "type": "integer", "minimum": 0, "maximum": 100 },
+        "language": { "type": ["string", "null"] },
+        "analyzed": { "type": "boolean" },
+        "formatOnly": { "type": "boolean" },
+        "hunks": { "type": "array", "items": { "type": "string" } },
+        "lines": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["side", "line", "category"],
+            "properties": {
+              "side": { "$ref": "#/$defs/side" },
+              "line": { "$ref": "#/$defs/line" },
+              "category": { "$ref": "#/$defs/category" },
+              "ref": { "type": "string", "pattern": "^[rm][0-9]+$" },
+              "reason": { "$ref": "#/$defs/realReason" }
+            }
+          }
+        }
+      }
+    },
+    "diagnostic": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["code", "message"],
+      "properties": {
+        "file": { "type": "string" },
+        "code": { "type": "string" },
+        "message": { "type": "string" }
+      }
+    }
+  }
+}

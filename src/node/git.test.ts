@@ -58,6 +58,17 @@ describe("git mode", () => {
     expect(worktree.files.find((file) => file.newPath === "src/new.ts")!.status).toBe("added");
   });
 
+  test("treats a file removed from the index but still on disk as modified", async () => {
+    const root = repoFrom(golden);
+    testGit(root, "checkout", "-q", "base");
+    writeFileSync(join(root, "src/utils.ts"), "export function getUser(id: string) {\n  return db.query('select * from users where id = ?', [id]);\n}\n");
+    testGit(root, "rm", "-q", "--cached", "src/utils.ts");
+
+    const result = await siftRevision(root, undefined);
+    const utils = result.files.filter((file) => (file.newPath ?? file.oldPath) === "src/utils.ts");
+    expect(utils.map((file) => file.status)).toEqual(["modified"]);
+  });
+
   test("limits analysis to pathspecs", async () => {
     const root = repoFrom(golden);
     const result = await siftRevision(root, "base..HEAD", false, { paths: ["src/api.ts"] });

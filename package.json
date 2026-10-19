@@ -6,10 +6,44 @@
   "license": "MIT",
   "author": "bottercode",
   "repository": "github:bottercode/diffsift",
-  "keywords": ["diff", "semantic-diff", "code-review", "tree-sitter", "typescript", "refactoring", "mcp", "agent-skill"],
+  "homepage": "https://github.com/bottercode/diffsift#readme",
+  "keywords": [
+    "diff",
+    "semantic-diff",
+    "code-review",
+    "tree-sitter",
+    "typescript",
+    "refactoring",
+    "mcp",
+    "agent-skill"
+  ],
   "bin": {
     "diffsift": "dist/cli.js"
   },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./browser": {
+      "types": "./dist/browser.d.ts",
+      "default": "./dist/browser.js"
+    },
+    "./schema.json": "./schema/diffsift.schema.v1.json",
+    "./wasm/*": "./wasm/*",
+    "./package.json": "./package.json"
+  },
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist",
+    "wasm",
+    "schema",
+    "skills",
+    "LICENSE",
+    "THIRD_PARTY_LICENSES.md",
+    "README.md"
+  ],
+  "sideEffects": false,
   "engines": {
     "node": ">=22"
   },
@@ -19,10 +53,12 @@
     "vendor": "bun scripts/vendor-grammars.ts",
     "build": "bun scripts/build.ts",
     "eval": "bun scripts/eval.ts",
-    "mutate": "bun scripts/mutate.ts"
+    "mutate": "bun scripts/mutate.ts",
+    "prepack": "bun run build"
   },
   "devDependencies": {
     "@types/bun": "^1.4.3",
+    "ajv": "8.20.0",
     "typescript": "^7.0.2"
   },
   "dependencies": {

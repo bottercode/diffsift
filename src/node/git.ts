@@ -133,6 +133,23 @@ export async function readGitPairs(repo: string, spec: GitSpec, paths: string[] 
     for (const path of untracked) {
       const bytes = await readFile(join(top, path)).catch(() => Buffer.alloc(0));
       const text = bytes.toString("utf8");
+
+      // A path removed from the index (`git rm --cached`) but still on disk shows up both as a
+      // deletion and as untracked; against the base it is one modified file, so pair them.
+      const deletedIndex = pairs.findIndex((pair) => pair.status === "deleted" && pair.oldPath === path);
+      const deleted = pairs[deletedIndex];
+      if (deleted) {
+        pairs[deletedIndex] = {
+          ...deleted,
+          newPath: path,
+          newText: text,
+          status: "modified",
+          hunks: lineHunks(deleted.oldText, text),
+          binary: deleted.binary || isBinary(bytes),
+        };
+        continue;
+      }
+
       pairs.push({ oldPath: null, newPath: path, oldText: "", newText: text, status: "added", hunks: lineHunks("", text), binary: isBinary(bytes) });
     }
   }
